@@ -1,13 +1,29 @@
-const Users = require('../models/users.models')
-
+const Users = require('../models/users.models');
+const ValidateUser = require('../Validation/Users.validation');
 
 
 
 
 const AddUser = async (req, res)=> {
+
+const {errors, isValid}= ValidateUser(req.body);
+
 try {
-    await Users.create(req.body)
-    res.status(201).json({message: 'user add with success'})
+    if(!isValid){
+res.status(404).json(errors);
+} else {
+    await Users.findOne({ Email: req.body.Email }).then(async (exist) => {
+      if (exist) {
+        errors.Email = "User Exist";
+        res.status(404).json(errors);
+    }else{
+        await Users.create(req.body)
+        res.status(201).json({message: 'user add with success'})
+    }
+});
+}
+
+    
 } catch (error) {
     
 }
@@ -31,22 +47,28 @@ const FindSinglUser = async (req, res)=> {
     }
 }
 const UpdateUser = async (req, res)=> {
+
+    const { errors, isValid } = ValidateUser(req.body);
     try {
-        const data = await Users.findOneAndUpdate({_id: req.params.id },
+        if (!isValid) {
+          res.status(404).json(errors);
+        } else {
+          const data = await Users.findOneAndUpdate(
+            { _id: req.params.id },
             req.body,
-            {new: true}
-            )
-        res.status(201).json(data)
-    } catch (error) {
-        console.log(error.message)
-    }
-}
-const DeleteUser = async (req, res)=> {
+            { new: true }
+          );
+          res.status(201).json(data);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+async function DeleteUser(req, res) {
     try {
-        await Users.findOneAndDelete({_id: req.params.id})
-        res.status(201).json({message: "user deleted with success"})
+        await Users.findOneAndDelete({ _id: req.params.id });
+        res.status(201).json({ message: "user deleted with success" });
     } catch (error) {
-        
     }
 }
 
