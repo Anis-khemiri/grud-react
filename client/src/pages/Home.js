@@ -68,7 +68,7 @@ function Home() {
   return (
     <div className="row p-4">
       <Alert message={message} show={show} />
-      <div className="mt-4">
+      <div className="text-center mb-4 mt-4">
         <h2>Crud Users</h2>
       </div>
       <div className="col-12 col-lg-4">
